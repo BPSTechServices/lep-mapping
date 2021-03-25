@@ -138,7 +138,7 @@ crunch2 <- function(method_name, var, method = "k", k.neighbor = 5, distance = 0
 ##### STEP 3: Analyze LEP language data #####
 
 ## Define list of LEP language variables using `acs19` object to find variable names
-lep_languages <- c('Spanish' = 'C16001_005', 'French Hatian' = 'C16001_008', 
+lep_languages <- c('Spanish' = 'C16001_005', 'French Haitian' = 'C16001_008', 
                    'Germanic' = 'C16001_011', 'Slavic' = 'C16001_014', 
                    'Other Indo-European languages' = 'C16001_017', 'Korean' = 'C16001_020', 
                    'Chinese' = 'C16001_023', 'Vietnamese' = 'C16001_026', 
@@ -180,7 +180,7 @@ languages <- get_acs(geography = "tract",
   select(GEOID:moe, cv:share_reliability, density, area, geometry, -c(cv, share_cv)) # reorder columns
 
 ## List of language names to iterate over
-langs <- c('Arabic', 'Chinese', 'French Hatian', 'Germanic', 'Korean', 
+langs <- c('Arabic', 'Chinese', 'French Haitian', 'Germanic', 'Korean', 
            'Other Asian languages', 'Other Indo-European languages', 'Other languages', 'Slavic', 'Spanish', 
            'Tagalog', 'Vietnamese')
 

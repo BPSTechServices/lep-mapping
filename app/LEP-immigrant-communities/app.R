@@ -13,25 +13,35 @@ library(leafsync)
 lep_and_birthplace_method_overlays <- readRDS("data/lep_and_birthplace_method_overlays_2019.rds")
 sf::st_crs(lep_and_birthplace_method_overlays) <- 4326
 
-lep_and_birthplaces <- readRDS("data/lep_and_birthplaces_2019.rds") %>% select(-NAME) 
+lep_and_birthplaces <- readRDS("data/lep_and_birthplaces_2019.rds") %>% select(-NAME) %>%
+    mutate(share = round(share * 100, 1),
+           share_moe = round(share_moe * 100, 1),
+           density = round(density, 0))
 sf::st_crs(lep_and_birthplaces) <- 4326
 
 choices_lang_bpl <- lep_and_birthplaces %>% 
-    filter(!(variable %in% c("ttl_speakers_base", "total"))) %>% 
+    filter(!(variable %in% c("ttl_speakers_base", "total", "French Haitian", 
+                             "Germanic", "Other Indo-European languages",
+                             "Other Asian languages", "Other languages"))) %>% 
     pull(variable) %>% unique()
 
 # Define UI for application that maps LEP languages and birthplaces of select groups
 ui <- dashboardPage(skin = "black",
-    dashboardHeader(title = "LEP & Immigrant Community Explorer", titleWidth = "380"),
-    dashboardSidebar(
-        div(style="padding: 15px 15px 15px 15px;", "This app allows you to map concentrations of LEP speakers by target languages to census tracts. Data does not exist for all language categories of which Portland has a significant population. To help infer critical languages, this app also allows you to map concentrations of the foreign-born population for target immigrant communities. The bottom-right map is spatial-statistical overlay of where we would suggest translation and interpretation services at a localized level. This app is intended to be a supplement to official ", tags$a(href="https://www.portlandoregon.gov/oehr/80870","OEHR language guidance"), "."),
-        selectInput(inputId = 'user_lang_bpl', 
-                                 label = 'Select LEP Language or Immigrant Birthplace', 
-                                 selected = 'Vietnamese', 
-                                 choices = choices_lang_bpl),
-        div(style="padding: 15px 15px 15px 15px;", "Note: Percentage estimates for country of birthplace are expressed as a share of total population in that census tract, not of foreign-born population. Density is expressed as people per square mile."),
-        div(style="padding: 15px 15px 15px 15px;", "Source: 2015-19 ACS 5-year estimates, Tables B05006 and C16001. Prepared March 24, 2021 by Portland Bureau of Planning & Sustainability.")),
-    dashboardBody(uiOutput("syncmap"))
+                    dashboardHeader(title = "LEP & Immigrant Community Explorer", titleWidth = "380"),
+                    
+                    dashboardSidebar(width = "280",
+                                     
+                                     div(style="padding: 15px 15px 15px 15px;", "This app allows you to map concentrations of speakers with limited English proficiency (LEP) by target languages. Census/ACS data do not exist for all language categories of which Portland has a significant population. To help infer critical languages, this app also allows you to map concentrations of the foreign-born population for target immigrant communities. The bottom-right map is spatial-statistical overlay of where we would suggest translation and interpretation services at a localized level. This app is intended to be a supplement to official ", tags$a(href="https://www.portlandoregon.gov/oehr/80870","OEHR language guidance"), "."),
+                                     
+                                     selectInput(inputId = 'user_lang_bpl', 
+                                                 label = 'Select LEP Language or Immigrant Birthplace', 
+                                                 selected = 'Vietnamese', 
+                                                 choices = choices_lang_bpl),
+                                     
+                                     div(style="padding: 15px 15px 15px 15px;", "Notes: These estimates contain wide margins of error, and they should not be used to infer neighborhood-level population levels. Use the 'reliability' field in the popup to better understand the data quality. Percentage estimates for LEP language categories are expressed as a share of population 5 years and over in that census tract. Percentage estimates for country of birthplace are expressed as a share of total population in that census tract, not of foreign-born population. Density is expressed as people per square mile."),
+                                     
+                                     div(style="padding: 15px 15px 15px 15px;", "Source: 2015-19 ACS 5-year estimates, Tables", tags$a(href="https://data.census.gov/cedsci/table?g=1600000US4159000&tid=ACSDT5Y2019.B05006&hidePreview=true","B05006"), " and ", tags$a(href="https://data.census.gov/cedsci/table?g=1600000US4159000&tid=ACSDT5Y2019.C16001&hidePreview=true","C16001"), ". Prepared March 24, 2021 by Portland Bureau of Planning & Sustainability. Contact point: ", tags$a(href="mailto:nick.kobel@portlandoregon.gov","Nick Kobel"), ".")),
+                    dashboardBody(uiOutput("syncmap"))
 )
 
 
