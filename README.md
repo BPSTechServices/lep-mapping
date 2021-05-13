@@ -13,7 +13,7 @@ Here are the steps taken to produce this analysis.
 ### Step 1: Narrow down list of critical languages
 Using a mixed-methods appraoch involving quantitative and qualitative data sources, the Office of Equity and Human Rights (OEHR) [posted guidance](https://www.portlandoregon.gov/oehr/80870) on select critical languages to consider in language justice work. This short list was used, along with two other languages: Eritrean and Ethiopean. In other communities, this step can be done by a [Title VI Factor 1 analysis](https://www.fhwa.dot.gov/civilrights/programs/title_vi/lep_fourfactor.cfm), which involves analyzing ACS data, such as [pre-published tables](https://data.census.gov/cedsci/table?q=ACSDT1Y2019.B16001&g=310M500US38900&tid=ACSDT1Y2019.B16001&hidePreview=true) or PUMS data, as well as collecting administrative data from school districts.
 
-### Step 2: Spatial analysis
+### Step 2: Perform spatial analysis to identify language clusters
 This analysis uses two spatial statistical methods on three metric types for flagging a tract as a significant contributor to the region's share of critical language speakers.
 
 1. **Spatial methods**: *k-nearest neighbor* (5 closest neighbors) and *distance-based* (1-mile radius from tract centroid). This approach outputs a "[local G](https://walker-data.com/2016/07/spatial-neighbors-in-r---an-interactive-illustration/)" statistic for the given tract, which is a standardized Z score for how correlated it is with its neighbors. 
@@ -34,7 +34,7 @@ Below is the decision tree to flag a tract-language combination as a significant
     2. Local G > 1.96 (two standard deviations above mean); OR
     3. Tract density is higher than the median **AND** density is higher than **85** people per square mile
 
-### Step 3: Shiny app
+### Step 3: Develop and publish shiny app
 To transform the data into a more user-friendly format, staff wrote a [shiny app](https://portlandbps.shinyapps.io/LEP-immigrant-communities) to allow users to map specific languages or countries of origin.
 
 ![Image of shiny app](https://github.com/BPSTechServices/lep-mapping/blob/main/images/lep_shiny_app_screenshot.PNG?raw=true)
