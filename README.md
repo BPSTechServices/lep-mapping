@@ -25,7 +25,7 @@ Below is the decision tree to flag a tract-language combination as a significant
     1. Estimate is not equal to zero; **AND** either of the following:
     2. Local G > 1.96 (two standard deviations above mean); OR
     3. Tract estimate is higher than the median **AND** density is higher than **85** people per square mile; 
-2. If percentage of the percentage:
+2. If percentage of the population:
     1. Estimate is not equal to zero; **AND** either of the following:
     2. Local G > 1.96 (two standard deviations above mean); OR
     3. Tract percentage is higher than the median **AND** density is higher than **40** people per square mile
