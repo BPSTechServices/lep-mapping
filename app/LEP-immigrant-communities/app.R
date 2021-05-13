@@ -8,7 +8,7 @@ library(leafsync)
 
 ## Sync in shiny: https://stackoverflow.com/questions/40272513/display-of-sync-mapview-in-shiny 
 
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+# setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 lep_and_birthplace_method_overlays <- readRDS("data/lep_and_birthplace_method_overlays_2019.rds")
 sf::st_crs(lep_and_birthplace_method_overlays) <- 4326
