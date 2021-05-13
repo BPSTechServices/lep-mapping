@@ -205,7 +205,7 @@ lep_dissolved <- lep_methods %>% group_by(language) %>% summarize() %>% st_trans
 ## Define list of countries for which we have flagged critical languages that don't appear in ACS LEP table C16001
 place_of_birth <- c("Nepal" = "B05006_062", "Ethiopia" = "B05006_094", "Somalia" = "B05006_096",
                     "Romania" = "B05006_041", "Burma (Karen)" = "B05006_068", "Japan" = "B05006_053",
-                    "Ukraine" = "B05006_044", "Eritria" = "B05006_093", "Thailand" = "B05006_075",
+                    "Ukraine" = "B05006_044", "Eritrea" = "B05006_093", "Thailand" = "B05006_075",
                     "Laos" = "B05006_071", "Hong Kong (Cantonese)" = "B05006_051", "Cambodia" = "B05006_069",
                     "Russia" = "B05006_042", "Micronesia (Chuukese)" = "B05006_127",
                     "total" = "B01001_001") # Use total population instead of foreign-born population as denominator
@@ -245,7 +245,7 @@ birthplace <- get_acs(geography = "tract",
   select(GEOID:moe, cv:share_reliability, density, area, geometry, -c(cv, share_cv))
 
 ## List of country names to iterate over
-birthplaces <- c("Nepal", "Ethiopia", "Somalia", "Romania", "Burma (Karen)", "Japan", "Ukraine", "Eritria",
+birthplaces <- c("Nepal", "Ethiopia", "Somalia", "Romania", "Burma (Karen)", "Japan", "Ukraine", "Eritrea",
                  "Thailand", "Laos", "Hong Kong (Cantonese)", "Micronesia (Chuukese)", "Cambodia", "Russia")
 
 ## Genearte 6 different birthplace overlays based on shares, estimates and densities using 2 spatial statistical approaches
@@ -276,24 +276,63 @@ sf::st_crs(lep_and_birthplace_method_overlays) <- 4326
 lep_and_birthplaces <- rbind(languages, birthplace) %>% st_transform(4326)
 sf::st_crs(lep_and_birthplaces) <- 4326
 
-saveRDS(lep_and_birthplace_method_overlays, "data/lep_and_birthplace_method_overlays_2019.rds")
-saveRDS(lep_and_birthplaces, "data/lep_and_birthplaces_2019.rds")
+saveRDS(lep_and_birthplace_method_overlays, "app/LEP-immigrant-communities/data/lep_and_birthplace_method_overlays_2019.rds")
+saveRDS(lep_and_birthplaces, "app/LEP-immigrant-communities/data/lep_and_birthplaces_2019.rds")
+
+### Optional: Display map grid of a particular language/country
+# bpl_lep_map <- function(target){
+#   sync(
+#     mapview(filter(lep_and_birthplaces,variable == target), zcol = "estimate", layer.name = paste0(target,"-#")),
+#     mapview(filter(lep_and_birthplaces,variable == target), zcol = "share", layer.name = paste0(target,"-%")),
+#     mapview(filter(lep_and_birthplaces,variable == target), zcol = "density", layer.name = paste0(target,"-density")),
+#     mapview(filter(lep_and_birthplace_method_overlays, language_or_birthplace == target))
+#   )
+# }
+
+# lep_and_birthplaces %>% 
+#   # arrange(variable) %>%
+#   filter(!(variable %in% c("ttl_speakers_base", "total"))) %>% 
+#   pull(variable) %>% unique()
+# 
+# bpl_lep_map("Laos")
 
 
-bpl_lep_map <- function(target){
-  sync(
-    mapview(filter(lep_and_birthplaces,variable == target), zcol = "estimate", layer.name = paste0(target,"-#")),
-    mapview(filter(lep_and_birthplaces,variable == target), zcol = "share", layer.name = paste0(target,"-%")),
-    mapview(filter(lep_and_birthplaces,variable == target), zcol = "density", layer.name = paste0(target,"-density")),
-    mapview(filter(lep_and_birthplace_method_overlays, language_or_birthplace == target))
-  )
-}
+##### STEP 5: Append overlay data #####
 
-lep_and_birthplaces %>% 
-  # arrange(variable) %>%
-  filter(!(variable %in% c("ttl_speakers_base", "total"))) %>% 
+choices_lang_bpl <- lep_and_birthplaces %>%
+  filter(!(variable %in% c("ttl_speakers_base", "total", "French Haitian",
+                           "Germanic", "Other Indo-European languages",
+                           "Other Asian languages", "Other languages"))) %>%
   pull(variable) %>% unique()
 
-bpl_lep_map("Laos")
+overlay_appended <- map_df(.x = choices_lang_bpl, .f = ~
+                             {
+                               overlay <- lep_and_birthplace_method_overlays %>%
+                                 filter(language_or_birthplace == .x) %>%
+                                 st_transform(2913) %>%
+                                 st_buffer(., -10) %>% # Negative buffer to account for sliver geometries
+                                 st_transform(4326)
+                               
+                               sf::st_crs(overlay) <- 4326
+                               
+                               tracts_in_overlay <- lep_and_birthplaces %>%
+                                 filter(variable == .x) %>%
+                                 st_join(., overlay) %>%
+                                 filter(language_or_birthplace == .x) %>%
+                                 select(GEOID, language_or_birthplace)
+                               
+                               lep_and_birthplaces %>%
+                                 filter(variable == .x) %>%
+                                 mutate(in_overlay = ifelse(GEOID %in% tracts_in_overlay$GEOID, TRUE, FALSE))
+                             })
+
+saveRDS(overlay_appended, "app/LEP-immigrant-communities/data/lep_and_birthplaces_w_overlay_2019.rds") 
 
 
+### Optional: Write to fgdb ####
+# library(arcgisbinding)
+# arc.check_product()
+# 
+# overlay_appended <- st_transform(overlay_appended, 'EPSG:2913')
+# sf::st_crs(overlay_appended) <- 2913
+# arc.write("data/data.gdb/lep_and_birthplaces_w_overlay_2019", overlay_appended, overwrite = TRUE)
