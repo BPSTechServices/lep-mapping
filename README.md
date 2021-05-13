@@ -35,9 +35,9 @@ Below is the decision tree to flag a tract-language combination as a significant
     3. Tract density is higher than the median **AND** density is higher than **85** people per square mile
 
 ### Step 3: Shiny app
-To transform the data into a more user-friendly format, staff wrote a [shiny app](https://portlandbps.shinyapps.io/LEP-immigrant-communities) to allow users to map specific languages or countries of origin. 
+To transform the data into a more user-friendly format, staff wrote a [shiny app](https://portlandbps.shinyapps.io/LEP-immigrant-communities) to allow users to map specific languages or countries of origin.
 
-![Image of shiny app](https://github.com/BPSTechServices/lep-mapping/images/lep_shiny_app_screenshot.PNG)
+![Image of shiny app](https://github.com/BPSTechServices/lep-mapping/blob/main/images/lep_shiny_app_screenshot.PNG?raw=true)
 
 ## Next steps
 The Bureau of Planning & Sustainability (BPS) and the Office of Equity and Human Rights (OEHR) are discussing how to best frame language justice within the City and which technical services such as this app we should provide to City staff and community partners who do community outreach in their work.
